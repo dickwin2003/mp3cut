@@ -1,0 +1,6 @@
+# 示例 .gitignore 内容（适用于 C# 项目）
+.vs/
+bin/
+obj/
+*.user
+*.suo
