@@ -39,48 +39,41 @@ namespace SimpleMp3Tool
 
             // 主窗体设置
             this.Text = "MP3文件管理工具";
-            this.Size = new Size(700, 600);
+            this.Size = new Size(900, 700);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.AllowDrop = true;
-
-            // 标题标签
-            var titleLabel = new Label();
-            titleLabel.Text = "MP3文件管理工具";
-            titleLabel.Font = new Font("微软雅黑", 16, FontStyle.Bold);
-            titleLabel.Location = new Point(12, 12);
-            titleLabel.Size = new Size(200, 30);
-            titleLabel.ForeColor = Color.DarkBlue;
-            this.Controls.Add(titleLabel);
-
-            // 说明标签
-            var infoLabel = new Label();
-            infoLabel.Text = "拖拽MP3文件到下方列表框，然后选择要执行的操作";
-            infoLabel.Location = new Point(12, 50);
-            infoLabel.Size = new Size(660, 20);
-            infoLabel.ForeColor = Color.Gray;
-            this.Controls.Add(infoLabel);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = true;
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.AutoSize = false;
+            this.MinimumSize = new Size(900, 500);
+            this.MaximumSize = new Size(900, 1200); // 只允许纵向拉伸
 
             // 文件列表框
             fileListBox = new ListBox();
-            fileListBox.Location = new Point(12, 80);
-            fileListBox.Size = new Size(660, 180);
+            fileListBox.Location = new Point(12, 12);
+            fileListBox.Size = new Size(860, 220);
             fileListBox.AllowDrop = true;
             fileListBox.SelectionMode = SelectionMode.MultiExtended;
+            fileListBox.HorizontalScrollbar = true;
+            fileListBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(fileListBox);
 
             // 清空按钮
             clearButton = new Button();
             clearButton.Text = "清空列表";
-            clearButton.Location = new Point(12, 275);
+            clearButton.Location = new Point(12, 245);
             clearButton.Size = new Size(100, 35);
+            clearButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             clearButton.Click += ClearButton_Click;
             this.Controls.Add(clearButton);
 
             // 操作按钮组
             var operationGroupBox = new GroupBox();
             operationGroupBox.Text = "文件操作";
-            operationGroupBox.Location = new Point(12, 320);
-            operationGroupBox.Size = new Size(660, 80);
+            operationGroupBox.Location = new Point(12, 290);
+            operationGroupBox.Size = new Size(860, 80);
             this.Controls.Add(operationGroupBox);
 
             copyButton = new Button();
@@ -108,7 +101,7 @@ namespace SimpleMp3Tool
             var cutGroupBox = new GroupBox();
             cutGroupBox.Text = "音频剪切";
             cutGroupBox.Location = new Point(12, 410);
-            cutGroupBox.Size = new Size(660, 100);
+            cutGroupBox.Size = new Size(860, 100);
             this.Controls.Add(cutGroupBox);
 
             var startLabel = new Label();
@@ -176,33 +169,38 @@ namespace SimpleMp3Tool
             outputLabel.Text = "输出路径:";
             outputLabel.Location = new Point(12, 525);
             outputLabel.Size = new Size(80, 20);
+            outputLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             this.Controls.Add(outputLabel);
 
             outputPathTextBox = new TextBox();
             outputPathTextBox.Location = new Point(100, 523);
-            outputPathTextBox.Size = new Size(450, 25);
+            outputPathTextBox.Size = new Size(650, 25);
             outputPathTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            outputPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(outputPathTextBox);
 
             browseOutputButton = new Button();
             browseOutputButton.Text = "浏览";
-            browseOutputButton.Location = new Point(560, 521);
+            browseOutputButton.Location = new Point(760, 521);
             browseOutputButton.Size = new Size(60, 28);
             browseOutputButton.Click += BrowseOutputButton_Click;
+            browseOutputButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.Controls.Add(browseOutputButton);
 
             // 进度条
             progressBar = new ProgressBar();
             progressBar.Location = new Point(12, 560);
-            progressBar.Size = new Size(660, 20);
+            progressBar.Size = new Size(860, 20);
+            progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(progressBar);
 
             // 状态标签
             statusLabel = new Label();
             statusLabel.Text = "就绪 - 请拖拽MP3文件到上方列表";
             statusLabel.Location = new Point(12, 590);
-            statusLabel.Size = new Size(660, 20);
+            statusLabel.Size = new Size(860, 20);
             statusLabel.ForeColor = Color.Green;
+            statusLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(statusLabel);
 
             this.ResumeLayout(false);
