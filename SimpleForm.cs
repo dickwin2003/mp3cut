@@ -26,6 +26,18 @@ namespace SimpleMp3Tool
         private TextBox startTimeTextBox;
         private TextBox endTimeTextBox;
         private NumericUpDown segmentsNumericUpDown;
+        private Button selectFileButton;
+
+        // 播放相关字段
+        private Button playButton;
+        private Button pauseButton;
+        private Button stopButton;
+        private TrackBar trackBar;
+        private Label timeLabel;
+        private System.Windows.Forms.Timer playbackTimer;
+        private IWavePlayer waveOut;
+        private Mp3FileReader mp3Reader;
+        private bool isDragging = false;
 
         public MainForm()
         {
@@ -69,38 +81,65 @@ namespace SimpleMp3Tool
             clearButton.Click += ClearButton_Click;
             this.Controls.Add(clearButton);
 
-            // 操作按钮组
-            var operationGroupBox = new GroupBox();
-            operationGroupBox.Text = "文件操作";
-            operationGroupBox.Location = new Point(12, 290);
-            operationGroupBox.Size = new Size(860, 80);
-            this.Controls.Add(operationGroupBox);
+            // 选择文件按钮
+            selectFileButton = new Button();
+            selectFileButton.Text = "请把文件拖入对话框或选择文件";
+            selectFileButton.Size = new Size(320, 35);
+            selectFileButton.Location = new Point((this.ClientSize.Width - selectFileButton.Width) / 2, 245);
+            selectFileButton.Anchor = AnchorStyles.Top;
+            selectFileButton.Click += SelectFileButton_Click;
+            this.Controls.Add(selectFileButton);
 
-            copyButton = new Button();
-            copyButton.Text = "复制文件";
-            copyButton.Location = new Point(20, 25);
-            copyButton.Size = new Size(100, 35);
-            copyButton.Click += CopyButton_Click;
-            operationGroupBox.Controls.Add(copyButton);
+            // 播放功能区（替换原文件操作区）
+            var playbackGroupBox = new GroupBox();
+            playbackGroupBox.Text = "音频播放";
+            playbackGroupBox.Location = new Point(12, 290);
+            playbackGroupBox.Size = new Size(860, 120);
+            playbackGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            this.Controls.Add(playbackGroupBox);
 
-            renameButton = new Button();
-            renameButton.Text = "重命名复制";
-            renameButton.Location = new Point(140, 25);
-            renameButton.Size = new Size(100, 35);
-            renameButton.Click += RenameButton_Click;
-            operationGroupBox.Controls.Add(renameButton);
+            playButton = new Button();
+            playButton.Text = "播放";
+            playButton.Location = new Point(30, 30);
+            playButton.Size = new Size(80, 35);
+            playButton.Click += PlayButton_Click;
+            playbackGroupBox.Controls.Add(playButton);
 
-            playlistButton = new Button();
-            playlistButton.Text = "创建播放列表";
-            playlistButton.Location = new Point(260, 25);
-            playlistButton.Size = new Size(120, 35);
-            playlistButton.Click += PlaylistButton_Click;
-            operationGroupBox.Controls.Add(playlistButton);
+            pauseButton = new Button();
+            pauseButton.Text = "暂停";
+            pauseButton.Location = new Point(130, 30);
+            pauseButton.Size = new Size(80, 35);
+            pauseButton.Click += PauseButton_Click;
+            playbackGroupBox.Controls.Add(pauseButton);
+
+            stopButton = new Button();
+            stopButton.Text = "停止";
+            stopButton.Location = new Point(230, 30);
+            stopButton.Size = new Size(80, 35);
+            stopButton.Click += StopButton_Click;
+            playbackGroupBox.Controls.Add(stopButton);
+
+            trackBar = new TrackBar();
+            trackBar.Location = new Point(330, 35);
+            trackBar.Size = new Size(400, 30);
+            trackBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trackBar.TickStyle = TickStyle.None;
+            trackBar.Scroll += TrackBar_Scroll;
+            trackBar.MouseDown += (s, e) => isDragging = true;
+            trackBar.MouseUp += (s, e) => { isDragging = false; SeekToTrackBar(); };
+            playbackGroupBox.Controls.Add(trackBar);
+
+            timeLabel = new Label();
+            timeLabel.Text = "00:00 / 00:00";
+            timeLabel.Location = new Point(750, 40);
+            timeLabel.Size = new Size(100, 20);
+            timeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            playbackGroupBox.Controls.Add(timeLabel);
 
             // 剪切功能区
             var cutGroupBox = new GroupBox();
             cutGroupBox.Text = "音频剪切";
-            cutGroupBox.Location = new Point(12, 410);
+            cutGroupBox.Location = new Point(12, 430);
             cutGroupBox.Size = new Size(860, 100);
             this.Controls.Add(cutGroupBox);
 
@@ -167,13 +206,13 @@ namespace SimpleMp3Tool
             // 输出路径
             var outputLabel = new Label();
             outputLabel.Text = "输出路径:";
-            outputLabel.Location = new Point(12, 525);
+            outputLabel.Location = new Point(12, 545);
             outputLabel.Size = new Size(80, 20);
             outputLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             this.Controls.Add(outputLabel);
 
             outputPathTextBox = new TextBox();
-            outputPathTextBox.Location = new Point(100, 523);
+            outputPathTextBox.Location = new Point(100, 543);
             outputPathTextBox.Size = new Size(650, 25);
             outputPathTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             outputPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -181,7 +220,7 @@ namespace SimpleMp3Tool
 
             browseOutputButton = new Button();
             browseOutputButton.Text = "浏览";
-            browseOutputButton.Location = new Point(760, 521);
+            browseOutputButton.Location = new Point(760, 541);
             browseOutputButton.Size = new Size(60, 28);
             browseOutputButton.Click += BrowseOutputButton_Click;
             browseOutputButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -189,7 +228,7 @@ namespace SimpleMp3Tool
 
             // 进度条
             progressBar = new ProgressBar();
-            progressBar.Location = new Point(12, 560);
+            progressBar.Location = new Point(12, 580);
             progressBar.Size = new Size(860, 20);
             progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(progressBar);
@@ -197,11 +236,16 @@ namespace SimpleMp3Tool
             // 状态标签
             statusLabel = new Label();
             statusLabel.Text = "就绪 - 请拖拽MP3文件到上方列表";
-            statusLabel.Location = new Point(12, 590);
+            statusLabel.Location = new Point(12, 610);
             statusLabel.Size = new Size(860, 20);
             statusLabel.ForeColor = Color.Green;
             statusLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(statusLabel);
+
+            // 播放进度定时器
+            playbackTimer = new System.Windows.Forms.Timer();
+            playbackTimer.Interval = 500;
+            playbackTimer.Tick += PlaybackTimer_Tick;
 
             this.ResumeLayout(false);
         }
@@ -557,6 +601,122 @@ namespace SimpleMp3Tool
                     outputPathTextBox.Text = folderDialog.SelectedPath;
                     statusLabel.Text = $"输出路径已设置为: {folderDialog.SelectedPath}";
                 }
+            }
+        }
+
+        private void SelectFileButton_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new OpenFileDialog())
+            {
+                dlg.Title = "选择MP3文件";
+                dlg.Filter = "MP3文件 (*.mp3)|*.mp3";
+                dlg.Multiselect = true;
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    int addedCount = 0;
+                    foreach (var file in dlg.FileNames)
+                    {
+                        if (!fileListBox.Items.Contains(file))
+                        {
+                            fileListBox.Items.Add(file);
+                            addedCount++;
+                        }
+                    }
+                    statusLabel.Text = $"已添加 {addedCount} 个新文件，总共 {fileListBox.Items.Count} 个MP3文件";
+                }
+            }
+        }
+
+        private void PlayButton_Click(object sender, EventArgs e)
+        {
+            if (fileListBox.SelectedItem == null)
+            {
+                MessageBox.Show("请选择一个MP3文件进行播放", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            try
+            {
+                StopPlayback();
+                string file = fileListBox.SelectedItem.ToString();
+                mp3Reader = new Mp3FileReader(file);
+                waveOut = new WaveOutEvent();
+                waveOut.Init(mp3Reader);
+                waveOut.Play();
+                trackBar.Maximum = (int)mp3Reader.TotalTime.TotalSeconds;
+                trackBar.Value = 0;
+                timeLabel.Text = $"00:00 / {mp3Reader.TotalTime.ToString("mm':'ss")}";
+                playbackTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"播放失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            if (waveOut != null)
+            {
+                if (waveOut.PlaybackState == PlaybackState.Playing)
+                    waveOut.Pause();
+                else if (waveOut.PlaybackState == PlaybackState.Paused)
+                    waveOut.Play();
+            }
+        }
+
+        private void StopButton_Click(object sender, EventArgs e)
+        {
+            StopPlayback();
+        }
+
+        private void StopPlayback()
+        {
+            playbackTimer.Stop();
+            if (waveOut != null)
+            {
+                waveOut.Stop();
+                waveOut.Dispose();
+                waveOut = null;
+            }
+            if (mp3Reader != null)
+            {
+                mp3Reader.Dispose();
+                mp3Reader = null;
+            }
+            if (trackBar != null)
+                trackBar.Value = 0;
+            if (timeLabel != null)
+                timeLabel.Text = "00:00 / 00:00";
+        }
+
+        private void PlaybackTimer_Tick(object sender, EventArgs e)
+        {
+            if (mp3Reader != null && waveOut != null && !isDragging)
+            {
+                int seconds = (int)mp3Reader.CurrentTime.TotalSeconds;
+                if (seconds >= 0 && seconds <= trackBar.Maximum)
+                    trackBar.Value = seconds;
+                timeLabel.Text = $"{mp3Reader.CurrentTime.ToString("mm':'ss")} / {mp3Reader.TotalTime.ToString("mm':'ss")}";
+                if (mp3Reader.CurrentTime >= mp3Reader.TotalTime)
+                    StopPlayback();
+            }
+        }
+
+        private void TrackBar_Scroll(object sender, EventArgs e)
+        {
+            if (mp3Reader != null && isDragging)
+            {
+                mp3Reader.CurrentTime = TimeSpan.FromSeconds(trackBar.Value);
+                timeLabel.Text = $"{mp3Reader.CurrentTime.ToString("mm':'ss")} / {mp3Reader.TotalTime.ToString("mm':'ss")}";
+            }
+        }
+
+        private void SeekToTrackBar()
+        {
+            if (mp3Reader != null)
+            {
+                mp3Reader.CurrentTime = TimeSpan.FromSeconds(trackBar.Value);
+                timeLabel.Text = $"{mp3Reader.CurrentTime.ToString("mm':'ss")} / {mp3Reader.TotalTime.ToString("mm':'ss")}";
             }
         }
     }
