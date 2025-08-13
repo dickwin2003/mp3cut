@@ -116,15 +116,13 @@ dotnet run
 如果这个工具对你有帮助，可以请我喝杯咖啡 ☕
 
 <div align="center">
-
-### 微信打赏
-<img src="wechat.jpg" alt="微信打赏" width="200" style="margin: 10px;"/>
-
-### 支付宝打赏
-<img src="alipay.jpg" alt="支付宝打赏" width="200" style="margin: 10px;"/>
-
-**感谢您的支持！** ❤️
-
+  
+| 微信打赏 | 支付宝打赏 |
+|:--------:|:----------:|
+| <img src="wechat.jpg" alt="微信打赏" width="200"/> | <img src="alipay.jpg" alt="支付宝打赏" width="200"/> |
+  
+  **感谢您的支持！** ❤️
+  
 </div>
 
 ## 📄 许可证
