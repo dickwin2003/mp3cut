@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#bgGradient)" />
+  
+  <!-- Music note symbol -->
+  <g transform="translate(128, 128) scale(0.8)" fill="#ffffff">
+    <path d="M-50,-60 L-50,-20 C-60,-25 -75,-30 -85,-25 C-95,-20 -100,-5 -95,5 C-90,15 -75,20 -65,15 C-55,10 -50,0 -50,-5 L-50,60 L-30,60 L-30,-5 C-30,-10 -25,-20 -15,-25 C-5,-30 10,-25 15,-15 C20,-5 15,10 5,15 C-5,20 -20,15 -30,10 L-30,60 L-50,60 Z" />
+  </g>
+  
+  <!-- Cut scissors symbol -->
+  <g transform="translate(128, 128) scale(0.3) translate(60, 40)" fill="#ffffff">
+    <circle cx="-30" cy="-20" r="8" />
+    <circle cx="-10" cy="-20" r="8" />
+    <circle cx="10" cy="-20" r="8" />
+    <circle cx="30" cy="-20" r="8" />
+    <path d="M-40,-10 L40,20 M-40,20 L40,-10" stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none" />
+  </g>
+  
+  <!-- Audio wave visualization -->
+  <g transform="translate(128, 128) scale(0.4) translate(0, 80)" stroke="url(#waveGradient)" stroke-width="4" stroke-linecap="round" fill="none">
+    <path d="M-60,-20 L-60,20 M-45,-30 L-45,30 M-30,-15 L-30,15 M-15,-35 L-15,35 M0,-25 L0,25 M15,-40 L15,40 M30,-20 L30,20 M45,-30 L45,30 M60,-15 L60,15" />
+  </g>
+  
+  <!-- Glossy effect -->
+  <ellipse cx="128" cy="80" rx="60" ry="30" fill="url(#waveGradient)" opacity="0.3" />
+</svg>

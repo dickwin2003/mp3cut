@@ -1,0 +1,17 @@
+# Icon Instructions
+
+Since we don't have advanced image tools available, here's what to do:
+
+## Option 1: Windows Users
+Run `create_icons.bat` on Windows to generate icons using PowerShell
+
+## Option 2: Manual Creation
+1. Use any image editor to create a 256x256 PNG
+2. Background: Purple gradient (#667eea to #764ba2)
+3. Add white music note and scissors icons
+4. Save as: mp3cut.png, icon-256.png, icon-128.png, icon-64.png, icon-32.png
+5. Convert to ICO using online tools like: https://convertico.com/
+
+## Option 3: Use Existing
+- Use the included mp3cut.png as a starting point
+- Or use any music-related icon you prefer
